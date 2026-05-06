@@ -1,0 +1,25 @@
+[project_cfg]
+name = "NftAuction"
+
+[api]
+port = ":80"
+max_num = 500
+
+[log]
+compress = false
+keep_days = 7
+level = "info"
+mode = "console"
+path = "logs/v1-backend"
+service_name = "v1-backend"
+
+[db]
+database = "xxx"
+password = "xxx"
+port = 3306
+max_open_conns = 1500
+host = "127.0.0.1"
+log_level = "info"
+max_conn_max_lifetime = 300
+user = "xxx"
+max_idle_conns = 10

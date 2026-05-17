@@ -1,14 +1,15 @@
 package config
 
 import (
-	"github.com/spf13/viper"
 	"strings"
+
+	"github.com/spf13/viper"
 )
 
 type Config struct {
 	Server     *Server     `toml:"server" json:"server"`
 	ProjectCfg *ProjectCfg `toml:"project_cfg" mapstructure:"project_cfg" json:"project_cfg"`
-	Log        *LogConf    `toml:"log" json:"log"`
+	Log        LogConf     `toml:"log" json:"log"`
 	DB         *DBConfig   `toml:"db" json:"db"`
 }
 

@@ -2,17 +2,23 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
+	"nft-auction-backend/internal/app"
+	"nft-auction-backend/internal/config"
+	"nft-auction-backend/internal/service/svc"
 	"os/signal"
 	"syscall"
 	"time"
-
-	"nft-auction-backend/internal/server"
 )
 
-func gracefulShutdown(apiServer *http.Server, done chan bool) {
+const (
+	defaultConfigPath = "./config/config.toml"
+)
+
+func gracefulShutdown(apiServer *app.App, done chan bool) {
 	// Create context that listens for the interrupt signal from the OS.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
@@ -38,16 +44,29 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 }
 
 func main() {
+	conf := flag.String("conf", defaultConfigPath, "conf file path")
+	flag.Parse()
+	c, err := config.Load(*conf)
+	if err != nil {
+		panic(err)
+	}
 
-	server := server.NewServer()
+	serverCtx, err := svc.NewServiceContext(c)
+	if err != nil {
+		panic(err)
+	}
+
+	r := router.NewRouter(serverCtx)
+
+	app := app.NewApp(c, r, serverCtx)
 
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)
 
 	// Run graceful shutdown in a separate goroutine
-	go gracefulShutdown(server, done)
+	go gracefulShutdown(app, done)
 
-	err := server.ListenAndServe()
+	err = app.Run()
 	if err != nil && err != http.ErrServerClosed {
 		panic(fmt.Sprintf("http server error: %s", err))
 	}

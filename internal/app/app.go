@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"nft-auction-backend/internal/config"
 	"nft-auction-backend/internal/service/svc"
 
@@ -21,6 +22,10 @@ func NewApp(config *config.Config, router *gin.Engine, serverCtx *svc.ServerCtx)
 	}
 }
 
-func (a *App) run() {
+func (a *App) Run() error {
+	return nil
+}
 
+func (a *App) Shutdown(ctx context.Context) error {
+	return nil
 }

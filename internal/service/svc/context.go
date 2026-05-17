@@ -2,6 +2,8 @@ package svc
 
 import (
 	"nft-auction-backend/internal/config"
+	"nft-auction-backend/internal/logger"
+	"nft-auction-backend/internal/store/gdb"
 
 	"gorm.io/gorm"
 )
@@ -12,9 +14,16 @@ type ServerCtx struct {
 }
 
 func NewServiceContext(c *config.Config) (*ServerCtx, error) {
-	var err error
-	db, err := gdb.NewDB(&c.DB)
+	_, err := logger.Init(c.Log)
 	if err != nil {
 		return nil, err
 	}
+	db, err := gdb.NewDB(c.DB)
+	if err != nil {
+		return nil, err
+	}
+	return &ServerCtx{
+		c,
+		db,
+	}, nil
 }

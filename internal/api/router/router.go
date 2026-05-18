@@ -1,6 +1,8 @@
 package router
 
 import (
+	"nft-auction-backend/internal/api/middleware"
+	"nft-auction-backend/internal/service/svc"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -13,11 +15,13 @@ func NewRouter(svcCtx *svc.ServerCtx) *gin.Engine {
 	gin.ForceConsoleColor()
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
-	r.Use(middleware.RecoverMiddleware())
-	r.Use(middleware.RLog())
+	//恢复
+	r.Use(gin.Recovery())
+	//日志记录
+	r.Use(middleware.LoggerMiddleware())
 
 	r.Use(cors.New(cors.Config{
-		AllowAllOrigins:  true,
+		AllowOrigins:     []string{"http://localhost:5173"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
 		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "X-CSRF-Token", "Authorization", "AccessToken", "Token"},
 		ExposeHeaders:    []string{"Content-Length", "Content-Type", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "X-GW-Error-Code", "X-GW-Error-Message"},
@@ -25,7 +29,7 @@ func NewRouter(svcCtx *svc.ServerCtx) *gin.Engine {
 		MaxAge:           1 * time.Hour,
 	}))
 	// register for parameter checkers
-	loadV1(r, svcCtx)
+	//loadV1(r, svcCtx)
 
 	// setup swagger ui server side
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

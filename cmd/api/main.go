@@ -2,20 +2,12 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"log"
-	"net/http"
 	"nft-auction-backend/internal/app"
-	"nft-auction-backend/internal/config"
-	"nft-auction-backend/internal/service/svc"
 	"os/signal"
 	"syscall"
 	"time"
-)
-
-const (
-	defaultConfigPath = "./config/config.toml"
 )
 
 func gracefulShutdown(apiServer *app.App, done chan bool) {
@@ -44,21 +36,11 @@ func gracefulShutdown(apiServer *app.App, done chan bool) {
 }
 
 func main() {
-	conf := flag.String("conf", defaultConfigPath, "conf file path")
-	flag.Parse()
-	c, err := config.Load(*conf)
+
+	app, err := app.NewApp()
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("init app error: %s", err))
 	}
-
-	serverCtx, err := svc.NewServiceContext(c)
-	if err != nil {
-		panic(err)
-	}
-
-	r := router.NewRouter(serverCtx)
-
-	app := app.NewApp(c, r, serverCtx)
 
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)
@@ -67,8 +49,8 @@ func main() {
 	go gracefulShutdown(app, done)
 
 	err = app.Run()
-	if err != nil && err != http.ErrServerClosed {
-		panic(fmt.Sprintf("http server error: %s", err))
+	if err != nil {
+		panic(fmt.Sprintf("app run error: %s", err))
 	}
 
 	// Wait for the graceful shutdown to complete

@@ -3,6 +3,7 @@ package config
 import (
 	"strings"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
@@ -44,6 +45,7 @@ type LogConf struct {
 }
 
 func Load(configFilePath string) (*Config, error) {
+	godotenv.Load()
 	viper.SetConfigFile(configFilePath)
 	viper.SetConfigType("toml")
 	viper.AutomaticEnv()

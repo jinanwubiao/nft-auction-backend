@@ -2,6 +2,7 @@ package router
 
 import (
 	"nft-auction-backend/internal/api/middleware"
+	v1 "nft-auction-backend/internal/api/v1"
 	"nft-auction-backend/internal/service/svc"
 	"time"
 
@@ -28,11 +29,19 @@ func NewRouter(svcCtx *svc.ServerCtx) *gin.Engine {
 		AllowCredentials: true,
 		MaxAge:           1 * time.Hour,
 	}))
-	// register for parameter checkers
-	//loadV1(r, svcCtx)
+	
+	loadV1(r, svcCtx)
 
 	// setup swagger ui server side
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	return r
+}
+
+func loadV1(r *gin.Engine, svcCtx *svc.ServerCtx) {
+	apiV1 := r.Group("/api/v1")
+	user := apiV1.Group("/user")
+	{
+		user.GET("/login", v1.UserLoginHandler(svcCtx))
+	}
 }

@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"flag"
+	"fmt"
 	"net/http"
 	"nft-auction-backend/internal/api/router"
 	"nft-auction-backend/internal/config"
@@ -32,6 +33,7 @@ func NewApp() (*App, error) {
 	if err != nil {
 		return nil, err
 	}
+	fmt.Printf("database:%s", c.DB.Database)
 	//初始化服务
 	serverCtx, err := svc.NewServiceContext(c)
 	if err != nil {
@@ -63,8 +65,10 @@ func (app *App) Run() error {
 	return nil
 }
 
-func (a *App) Shutdown(ctx context.Context) error {
+func (app *App) Shutdown(ctx context.Context) error {
+	//关停服务
+	err := app.httpServer.Shutdown(ctx)
 	//同步日志缓冲区
 	logger.Sync()
-	return nil
+	return err
 }

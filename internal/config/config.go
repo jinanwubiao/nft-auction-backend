@@ -3,6 +3,7 @@ package config
 import (
 	"strings"
 
+	"github.com/holiman/uint256"
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
@@ -46,8 +47,11 @@ type LogConf struct {
 }
 
 type EthConf struct {
-	RpcUrl  string `toml:"rpc_url" mapstructure:"rpc_url" json:"rpc_url"`
-	ChainId uint64 `toml:"chain_id" mapstructure:"chain_id" json:"chain_id"`
+	RpcUrl      string `toml:"rpc_url" mapstructure:"rpc_url" json:"rpc_url"`
+	ChainId     uint64 `toml:"chain_id" mapstructure:"chain_id" json:"chain_id"`
+	AuctionAddr string `toml:"auction_addr" mapstructure:"auction_addr" json:"auction_addr"`
+	BatchSize   uint64 `toml:"batch_size" mapstructure:"batch_size" json:"batch_size"`
+	BLockDelay  uint64 `toml:"block_delay" mapstructure:"block_delay" json:"block_delay"`
 }
 
 func Load(configFilePath string) (*Config, error) {

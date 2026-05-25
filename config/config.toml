@@ -27,3 +27,6 @@ max_idle_conns = 10
 [eth]
 rpc_url = "https://infura.io..."
 chain_id = 1
+auction_addr = "0x111111"
+batch_size = 2000
+block_delay = 6

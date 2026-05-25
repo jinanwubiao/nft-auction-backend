@@ -23,3 +23,7 @@ log_level = "info"
 max_conn_max_lifetime = 300
 user = "xxx"
 max_idle_conns = 10
+
+[eth]
+rpc_url = "https://infura.io..."
+chain_id = 1

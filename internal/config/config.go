@@ -12,6 +12,7 @@ type Config struct {
 	ProjectCfg *ProjectCfg `toml:"project_cfg" mapstructure:"project_cfg" json:"project_cfg"`
 	Log        LogConf     `toml:"log" json:"log"`
 	DB         *DBConfig   `toml:"db" json:"db"`
+	EthCfg     *EthConf
 }
 
 type Server struct {
@@ -42,6 +43,11 @@ type LogConf struct {
 	Level       string `toml:"level" json:"level"`
 	Compress    bool   `toml:"compress" json:"compress"`
 	KeepDays    int    `toml:"keep_days" mapstructure:"keep_days" json:"keep_days"`
+}
+
+type EthConf struct {
+	RpcUrl  string `toml:"rpc_url" mapstructure:"rpc_url" json:"rpc_url"`
+	ChainId uint64 `toml:"chain_id" mapstructure:"chain_id" json:"chain_id"`
 }
 
 func Load(configFilePath string) (*Config, error) {

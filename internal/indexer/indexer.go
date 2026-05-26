@@ -24,6 +24,8 @@ type Indexer struct {
 	stopChan chan struct{}
 }
 
+var testLastBlockNum uint64 = 10910860
+
 func NewIndexer(cfg *config.EthConf, svcCtx *svc.ServerCtx) (*Indexer, error) {
 	ec, err := ethclient.Dial(cfg.RpcUrl)
 	if err != nil {
@@ -86,15 +88,17 @@ func (i *Indexer) syncBlocks(ctx context.Context) error {
 	startBlock := lastSyncedBlock + 1
 	if startBlock > safeLatestBlock {
 		// 已经追到最新高度，无需同步
+		logger.S().Info("已经追到最新高度，无需同步")
 		return nil
 	}
 
 	// 4. 计算本次同步的结束位置（防止单次跨度过大被 RPC 限流）
-	endBlock := startBlock + i.cfg.BLockDelay - 1
+	endBlock := startBlock + i.cfg.BatchSize - 1
 	if endBlock > safeLatestBlock {
 		endBlock = safeLatestBlock
 	}
-
+	logger.S().Infof("chainLatestBlock:%d", chainLatestBlock)
+	logger.S().Infof("safeLatestBlock:%d", safeLatestBlock)
 	logger.S().Infof("Syncing blocks from %d to %d", startBlock, endBlock)
 
 	// 5. 调用 RPC 的 getLogs 并处理业务逻辑
@@ -111,7 +115,7 @@ func (i *Indexer) syncBlocks(ctx context.Context) error {
 }
 
 func (i *Indexer) getLastSyncedBlockFromDB(ctx context.Context) (uint64, error) {
-	return 0, nil
+	return testLastBlockNum, nil
 }
 
 func (i *Indexer) getChainLatestBlock(ctx context.Context) (uint64, error) {
@@ -123,7 +127,7 @@ func (i *Indexer) getChainLatestBlock(ctx context.Context) (uint64, error) {
 }
 
 func (i *Indexer) updateSyncedBlockInDB(ctx context.Context, blockNum uint64) error {
-
+	testLastBlockNum = blockNum
 	return nil
 }
 

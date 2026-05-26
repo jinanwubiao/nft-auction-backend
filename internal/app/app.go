@@ -3,10 +3,10 @@ package app
 import (
 	"context"
 	"flag"
-	"fmt"
 	"net/http"
 	"nft-auction-backend/internal/api/router"
 	"nft-auction-backend/internal/config"
+	"nft-auction-backend/internal/indexer"
 	"nft-auction-backend/internal/logger"
 	"nft-auction-backend/internal/service/svc"
 	"time"
@@ -15,10 +15,11 @@ import (
 )
 
 type App struct {
-	config     *config.Config
-	httpServer *http.Server
-	router     *gin.Engine
-	serverCtx  *svc.ServerCtx
+	cfg     *config.Config
+	httpSrv *http.Server
+	router  *gin.Engine
+	svcCtx  *svc.ServerCtx
+	idx     *indexer.Indexer
 }
 
 const (
@@ -33,9 +34,13 @@ func NewApp() (*App, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("database:%s", c.DB.Database)
 	//初始化服务
 	serverCtx, err := svc.NewServiceContext(c)
+	if err != nil {
+		return nil, err
+	}
+	//初始化索引器
+	idx, err := indexer.NewIndexer(c.Eth, serverCtx)
 	if err != nil {
 		return nil, err
 	}
@@ -50,16 +55,19 @@ func NewApp() (*App, error) {
 		WriteTimeout: 30 * time.Second,
 	}
 	return &App{
-		config:     c,
-		httpServer: httpServer,
-		router:     r,
-		serverCtx:  serverCtx,
+		cfg:     c,
+		httpSrv: httpServer,
+		router:  r,
+		svcCtx:  serverCtx,
+		idx:     idx,
 	}, nil
 }
 
 func (app *App) Run() error {
+	//启动索引器
+	go app.idx.Start()
 	//启动服务
-	if err := app.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+	if err := app.httpSrv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		return err
 	}
 	return nil
@@ -67,7 +75,9 @@ func (app *App) Run() error {
 
 func (app *App) Shutdown(ctx context.Context) error {
 	//关停服务
-	err := app.httpServer.Shutdown(ctx)
+	err := app.httpSrv.Shutdown(ctx)
+	//关闭索引器
+	app.idx.Stop()
 	//同步日志缓冲区
 	logger.Sync()
 	return err

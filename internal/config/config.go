@@ -3,7 +3,6 @@ package config
 import (
 	"strings"
 
-	"github.com/holiman/uint256"
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
@@ -13,7 +12,7 @@ type Config struct {
 	ProjectCfg *ProjectCfg `toml:"project_cfg" mapstructure:"project_cfg" json:"project_cfg"`
 	Log        LogConf     `toml:"log" json:"log"`
 	DB         *DBConfig   `toml:"db" json:"db"`
-	EthCfg     *EthConf
+	Eth        *EthConf    `toml:"eth" mapstructure:"eth" json:"eth"`
 }
 
 type Server struct {

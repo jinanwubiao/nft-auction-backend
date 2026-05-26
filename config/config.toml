@@ -16,7 +16,7 @@ service_name = "v1-backend"
 [db]
 database = "xxx"
 password = "xxx"
-port = 3306
+port = 123
 max_open_conns = 1500
 host = "127.0.0.1"
 log_level = "info"
@@ -26,7 +26,7 @@ max_idle_conns = 10
 
 [eth]
 rpc_url = "https://infura.io..."
-chain_id = 1
+chain_id = 123456
 auction_addr = "0x111111"
-batch_size = 2000
+batch_size = 10
 block_delay = 6

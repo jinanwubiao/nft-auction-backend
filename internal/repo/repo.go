@@ -8,7 +8,7 @@ import (
 
 func AutoMigrate(db *gorm.DB) error {
 	return db.AutoMigrate(
-		&model.SyncCheckpoint{}, &model.Nft{}, &model.Auction{},
+		&model.SyncPoint{}, &model.Nft{}, &model.Auction{},
 		&model.Bid{}, &model.PlatformMetric{},
 	)
 }

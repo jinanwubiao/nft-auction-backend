@@ -65,7 +65,7 @@ func NewApp() (*App, error) {
 
 func (app *App) Run() error {
 	//启动索引器
-	go app.idx.Start()
+	//go app.idx.Start()
 	//启动服务
 	if err := app.httpSrv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		return err
@@ -77,7 +77,7 @@ func (app *App) Shutdown(ctx context.Context) error {
 	//关停服务
 	err := app.httpSrv.Shutdown(ctx)
 	//关闭索引器
-	app.idx.Stop()
+	//app.idx.Stop()
 	//同步日志缓冲区
 	logger.Sync()
 	return err
